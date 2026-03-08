@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XE Studio – Cinematic Video Editing by Braj Dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;900&family=Rajdhani:wght@300;400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#ff0000;--dark:#470202;--deep:#290101;--mid:#520101;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:#000;color:#fff;font-family:'Rajdhani',sans-serif;overflow-x:hidden;cursor:none;}
+#cur{width:13px;height:13px;background:var(--red);border-radius:50%;position:fixed;pointer-events:none;z-index:99999;mix-blend-mode:screen;box-shadow:0 0 16px var(--red),0 0 32px var(--red);transform:translate(-50%,-50%);transition:transform .12s;}
+#curt{width:36px;height:36px;border:1.5px solid rgba(255,0,0,.38);border-radius:50%;position:fixed;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:left .18s,top .18s;}
+#pc{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.48;}
+
+/* ── INTRO ── */
+#intro{position:fixed;inset:0;background:#000;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.ibg{position:absolute;inset:0;background:radial-gradient(ellipse at center,#160000 0%,#000 72%);}
+.ipts{position:absolute;inset:0;overflow:hidden;}
+.sp{position:absolute;background:var(--red);border-radius:50%;box-shadow:0 0 6px var(--red);animation:spf linear infinite;}
+@keyframes spf{0%{transform:translateY(105vh) scale(0);opacity:0;}40%{opacity:1;}100%{transform:translateY(-12vh) scale(1.4);opacity:0;}}
+.ilogo{position:relative;z-index:2;text-align:center;animation:lrev 1.8s ease forwards;opacity:0;}
+@keyframes lrev{0%{opacity:0;transform:scale(.22) translateY(65px);filter:blur(38px);}65%{opacity:1;transform:scale(1.04) translateY(-5px);filter:blur(0);}100%{opacity:1;transform:scale(1) translateY(0);}}
+.ititl{font-family:'Cinzel Decorative',serif;font-size:clamp(2.8rem,9vw,7.5rem);font-weight:900;background:linear-gradient(180deg,#fff 0%,var(--red) 55%,#470202 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.1em;animation:tpls 2.5s ease-in-out infinite alternate;}
+@keyframes tpls{from{filter:drop-shadow(0 0 18px rgba(255,0,0,.5));}to{filter:drop-shadow(0 0 55px rgba(255,0,0,1)) drop-shadow(0 0 90px rgba(255,0,0,.35));}}
+.isub{font-family:'Orbitron',monospace;font-size:clamp(.55rem,1.3vw,.85rem);letter-spacing:.45em;color:rgba(255,80,80,.8);margin-top:.5rem;animation:fup 1s 1s ease forwards;opacity:0;}
+@keyframes fup{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.idiv{width:190px;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);margin:1.8rem auto;animation:exl 1s 1.5s ease forwards;transform:scaleX(0);}
+@keyframes exl{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+.ifrm{display:flex;flex-direction:column;align-items:center;gap:.9rem;animation:fup 1s 2s ease forwards;opacity:0;position:relative;z-index:2;}
+.ifrm label{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.3em;color:rgba(255,100,100,.65);}
+.iinp{background:rgba(71,2,2,.18);border:1px solid rgba(255,0,0,.4);border-radius:2px;padding:.8rem 2rem;color:#fff;font-family:'Rajdhani',sans-serif;font-size:1.1rem;letter-spacing:.2em;text-align:center;outline:none;width:300px;transition:all .3s;}
+.iinp:focus{border-color:var(--red);box-shadow:0 0 28px rgba(255,0,0,.28);}
+.iinp::placeholder{color:rgba(255,255,255,.18);}
+.ibtn{background:linear-gradient(135deg,#470202,#ff0000,#470202);background-size:200%;border:none;padding:.9rem 3rem;color:#fff;font-family:'Orbitron',monospace;font-size:.75rem;letter-spacing:.3em;cursor:pointer;transition:all .3s;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);animation:gsh 3s infinite;overflow:hidden;position:relative;}
+@keyframes gsh{0%{background-position:0 50%;}50%{background-position:100% 50%;}100%{background-position:0 50%;}}
+.ibtn:hover{box-shadow:0 0 40px var(--red);transform:scale(1.04);}
+#intro.exit{animation:iex .8s ease forwards;pointer-events:none;}
+@keyframes iex{0%{opacity:1;transform:scale(1);}50%{opacity:1;transform:scale(1.04);}100%{opacity:0;transform:scale(1.1);}}
+
+/* ── MAIN ── */
+#main{opacity:0;transition:opacity .9s;}
+#main.vis{opacity:1;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;inset-inline:0;z-index:1000;padding:1rem 4rem;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.72);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,0,0,.07);transition:all .3s;}
+nav.sc{padding:.65rem 4rem;background:rgba(0,0,0,.97);box-shadow:0 0 28px rgba(255,0,0,.06);}
+.nlo{font-family:'Cinzel Decorative',serif;font-size:1.32rem;font-weight:900;background:linear-gradient(90deg,#fff,var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+.nls{display:flex;gap:1.8rem;list-style:none;}
+.nls a{color:rgba(255,255,255,.58);text-decoration:none;font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.18em;transition:all .3s;position:relative;}
+.nls a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--red);transform:scaleX(0);transition:.3s;}
+.nls a:hover{color:#fff;text-shadow:0 0 14px var(--red);}
+.nls a:hover::after{transform:scaleX(1);}
+.nusr{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.18em;color:rgba(255,120,120,.8);padding:.36rem .85rem;border:1px solid rgba(255,0,0,.22);border-radius:2px;}
+
+/* ── HERO ── */
+#hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden;background:#000;}
+.hbg{position:absolute;inset:0;background:radial-gradient(ellipse at 24% 55%,rgba(71,2,2,.52) 0%,rgba(41,1,1,.22) 42%,#000 68%);}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,0,0,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,0,.022) 1px,transparent 1px);background-size:55px 55px;animation:gp 5s ease-in-out infinite alternate;}
+@keyframes gp{from{opacity:.22;}to{opacity:.65;}}
+
+/* Witch */
+.ww{position:absolute;right:0;top:0;bottom:0;width:58%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:4;}
+.wglw{position:absolute;width:560px;height:660px;background:radial-gradient(ellipse at center,rgba(255,0,0,.1) 0%,transparent 68%);border-radius:50%;animation:wgp 3.5s ease-in-out infinite alternate;}
+@keyframes wgp{from{transform:scale(.94);opacity:.45;}to{transform:scale(1.08);opacity:.9;}}
+.wimg{height:82vh;max-height:720px;width:auto;object-fit:contain;filter:drop-shadow(0 0 38px rgba(255,0,0,.95)) drop-shadow(0 0 85px rgba(255,0,0,.55)) drop-shadow(0 0 160px rgba(255,0,0,.22)) saturate(1.15) contrast(1.05) brightness(1.08);animation:wfl 4s ease-in-out infinite;position:relative;z-index:2;}
+@keyframes wfl{0%,100%{transform:translateY(0) rotate(0deg);}35%{transform:translateY(-18px) rotate(.6deg);}70%{transform:translateY(-9px) rotate(-.35deg);}}
+.eorb{position:absolute;width:68px;height:68px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.88) 0%,rgba(255,0,0,.78) 45%,transparent 70%);animation:orbp 1.6s ease-in-out infinite alternate;pointer-events:none;}
+.eorb.l{bottom:32%;right:47%;animation-delay:.22s;}
+.eorb.r{bottom:30%;right:31%;animation-delay:.52s;}
+@keyframes orbp{from{transform:scale(.75);box-shadow:0 0 20px rgba(255,0,0,.5),0 0 45px rgba(255,0,0,.25);}to{transform:scale(1.35);box-shadow:0 0 55px rgba(255,0,0,1),0 0 110px rgba(255,0,0,.6);}}
+.ern{position:absolute;border:1.5px solid rgba(255,80,80,.32);border-radius:50%;animation:rexp 2.2s ease-out infinite;}
+.ern:nth-child(1){width:88px;height:88px;animation-delay:0s;}
+.ern:nth-child(2){width:148px;height:148px;animation-delay:.45s;}
+.ern:nth-child(3){width:208px;height:208px;animation-delay:.9s;}
+@keyframes rexp{0%{transform:scale(0);opacity:.8;}100%{transform:scale(2.1);opacity:0;}}
+.wsp{position:absolute;width:3px;height:3px;background:var(--red);border-radius:50%;box-shadow:0 0 8px var(--red);animation:wsf linear infinite;}
+@keyframes wsf{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}}
+
+/* Hero content */
+.hc{position:relative;z-index:5;padding:0 5vw;max-width:680px;margin-top:80px;}
+.hbdg{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.4em;color:var(--red);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem;}
+.hbdg::before{content:'';display:inline-block;width:26px;height:1px;background:var(--red);box-shadow:0 0 8px var(--red);}
+.htit{font-family:'Cinzel',serif;font-size:clamp(2.4rem,5.5vw,5.2rem);font-weight:900;line-height:1.06;margin-bottom:1.4rem;}
+.htit .l1{display:block;background:linear-gradient(135deg,#fff 45%,rgba(255,160,160,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.htit .l2{display:block;background:linear-gradient(135deg,var(--red),#ff7070);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(255,0,0,.45));}
+.hdsc{font-size:1.05rem;color:rgba(255,255,255,.52);line-height:1.75;margin-bottom:2.4rem;max-width:480px;letter-spacing:.04em;}
+.hbs{display:flex;gap:1rem;flex-wrap:wrap;}
+
+/* Buttons */
+.bp{background:linear-gradient(135deg,#470202,#ff0000);border:none;padding:.88rem 2.4rem;color:#fff;font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:.2em;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:all .3s;text-decoration:none;display:inline-block;position:relative;overflow:hidden;}
+.bp::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:.5s;}
+.bp:hover::before{transform:translateX(100%);}
+.bp:hover{box-shadow:0 0 40px rgba(255,0,0,.55);transform:translateY(-2px);}
+.bs{background:transparent;border:1px solid rgba(255,0,0,.45);padding:.88rem 2.4rem;color:#fff;font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:.2em;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:all .3s;text-decoration:none;display:inline-block;}
+.bs:hover{background:rgba(255,0,0,.1);border-color:var(--red);box-shadow:0 0 28px rgba(255,0,0,.28);transform:translateY(-2px);}
+.scri{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:5;animation:fup 1s 3s ease forwards;opacity:0;}
+.scrl{width:1px;height:46px;background:linear-gradient(to bottom,var(--red),transparent);animation:scrp 2s ease-in-out infinite;}
+@keyframes scrp{0%,100%{transform:scaleY(1);opacity:1;}50%{transform:scaleY(.5);opacity:.38;}}
+.scrt{font-family:'Orbitron',monospace;font-size:.5rem;letter-spacing:.3em;color:rgba(255,0,0,.5);}
+
+/* ── SECTIONS ── */
+section{position:relative;padding:6rem 5vw;z-index:2;}
+.sh{text-align:center;margin-bottom:3.8rem;}
+.stg{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.5em;color:var(--red);margin-bottom:.7rem;display:block;}
+.stit{font-family:'Cinzel',serif;font-size:clamp(1.9rem,4.5vw,3.2rem);font-weight:900;background:linear-gradient(135deg,#fff,rgba(255,160,160,.85));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.8rem;}
+.sln{width:68px;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);margin:0 auto .9rem;box-shadow:0 0 8px var(--red);}
+.sdsc{color:rgba(255,255,255,.42);font-size:.92rem;letter-spacing:.04em;max-width:580px;margin:0 auto;}
+
+/* ── PORTFOLIO ── */
+#portfolio{background:linear-gradient(180deg,#000,rgba(41,1,1,.15),#000);}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.4rem;}
+.vc{position:relative;border-radius:4px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,0,0,.1);background:rgba(41,1,1,.16);transition:all .4s;aspect-ratio:16/9;}
+.vc:hover{border-color:rgba(255,0,0,.52);transform:translateY(-5px) scale(1.02);box-shadow:0 10px 52px rgba(255,0,0,.22);}
+.vov{position:absolute;inset:0;background:linear-gradient(180deg,transparent 38%,rgba(0,0,0,.92));display:flex;flex-direction:column;justify-content:flex-end;padding:1.4rem;opacity:0;transition:.3s;}
+.vc:hover .vov{opacity:1;}
+.vpl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:54px;height:54px;background:rgba(255,0,0,.8);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.3s;box-shadow:0 0 26px var(--red);}
+.vc:hover .vpl{transform:translate(-50%,-50%) scale(1);}
+.vpl::after{content:'';border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;}
+.vtit{font-family:'Cinzel',serif;font-size:.92rem;color:#fff;}
+.vmeta{font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.18em;color:var(--red);margin-top:.22rem;}
+
+/* ── MODAL ── */
+#vmod{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.96);display:none;align-items:center;justify-content:center;}
+#vmod.open{display:flex;}
+.minn{position:relative;width:90%;max-width:860px;background:#060000;border:1px solid rgba(255,0,0,.25);box-shadow:0 0 65px rgba(255,0,0,.22);padding:2rem;border-radius:4px;animation:mfin .3s ease;}
+@keyframes mfin{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+.mcls{position:absolute;top:.85rem;right:.85rem;width:32px;height:32px;background:rgba(255,0,0,.14);border:1px solid rgba(255,0,0,.32);color:#fff;font-size:1rem;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:.3s;}
+.mcls:hover{background:var(--red);box-shadow:0 0 16px var(--red);}
+.mvid{width:100%;aspect-ratio:16/9;background:#000;border:1px solid rgba(255,0,0,.12);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.75rem;text-align:center;padding:2rem;}
+
+/* ── EDIT STYLES ── */
+#styles{background:#000;}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.4rem;}
+.scard{background:#040000;border:1px solid rgba(255,0,0,.08);border-radius:4px;padding:1.85rem;transition:all .4s;position:relative;overflow:hidden;}
+.scard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(71,2,2,.25),transparent);opacity:0;transition:.4s;}
+.scard:hover{border-color:rgba(255,0,0,.42);transform:translateY(-5px);box-shadow:0 10px 42px rgba(255,0,0,.16);}
+.scard:hover::before{opacity:1;}
+.sico{font-size:2.3rem;margin-bottom:.85rem;display:block;filter:drop-shadow(0 0 12px rgba(255,0,0,.62));animation:ifl 3s ease-in-out infinite;}
+@keyframes ifl{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.snm{font-family:'Cinzel',serif;font-size:1.1rem;color:#fff;margin-bottom:.42rem;}
+.sdsc2{color:rgba(255,255,255,.45);font-size:.86rem;line-height:1.65;margin-bottom:1.3rem;}
+.smt{display:flex;justify-content:space-between;align-items:center;padding-top:.85rem;border-top:1px solid rgba(255,0,0,.07);}
+.spr{font-family:'Orbitron',monospace;font-size:.72rem;color:var(--red);letter-spacing:.07em;}
+.sdl{font-size:.78rem;color:rgba(255,255,255,.32);}
+.stbg{display:inline-block;padding:.16rem .68rem;background:rgba(255,0,0,.07);border:1px solid rgba(255,0,0,.15);border-radius:2px;font-family:'Orbitron',monospace;font-size:.5rem;letter-spacing:.16em;color:rgba(255,150,150,.72);margin-bottom:.85rem;}
+
+/* ── BEFORE/AFTER ── */
+#ba{background:linear-gradient(180deg,#000,rgba(41,1,1,.1),#000);}
+.bac{max-width:860px;margin:0 auto;border-radius:4px;overflow:hidden;border:1px solid rgba(255,0,0,.16);box-shadow:0 0 50px rgba(255,0,0,.1);aspect-ratio:16/9;position:relative;user-select:none;}
+.basl{position:relative;width:100%;height:100%;cursor:col-resize;}
+.bapn{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.bab{background:linear-gradient(135deg,#0a0a0a,#160000);left:0;}
+.baa{background:linear-gradient(135deg,#160000,#3e0000);}
+.balb{position:absolute;top:.85rem;font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.26em;padding:.32rem .85rem;background:rgba(0,0,0,.72);border:1px solid rgba(255,0,0,.16);}
+.balb.b{left:.85rem;}
+.balb.a{right:.85rem;}
+.baht{position:absolute;top:0;bottom:0;width:3px;background:var(--red);box-shadow:0 0 16px var(--red),0 0 32px rgba(255,0,0,.4);z-index:5;cursor:col-resize;}
+.baht::after{content:'⟺';position:absolute;top:50%;transform:translateY(-50%) translateX(-50%);width:34px;height:34px;background:var(--red);border-radius:50%;box-shadow:0 0 16px var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;line-height:34px;text-align:center;}
+.baraw{font-family:'Cinzel',serif;font-size:clamp(1.4rem,3.5vw,2.8rem);color:rgba(255,255,255,.2);}
+.baedt{font-family:'Cinzel',serif;font-size:clamp(1.4rem,3.5vw,2.8rem);color:var(--red);text-shadow:0 0 22px var(--red);}
+
+/* ── SHOWREEL ── */
+#sr{padding:0;min-height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.srbg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,rgba(71,2,2,.42) 50%,#000 100%);}
+.srln{position:absolute;width:1px;height:40%;background:linear-gradient(to bottom,transparent,rgba(255,0,0,.32),transparent);animation:lmv 4s ease-in-out infinite alternate;}
+.srln:nth-child(1){left:13%;top:8%;}
+.srln:nth-child(2){right:13%;top:28%;animation-delay:1.2s;}
+.srln:nth-child(3){left:32%;top:4%;animation-delay:2.2s;}
+@keyframes lmv{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+.srcon{position:relative;z-index:2;text-align:center;padding:2rem;}
+.srtit{font-family:'Cinzel',serif;font-size:clamp(3rem,8vw,7rem);font-weight:900;background:linear-gradient(135deg,rgba(255,255,255,.07),var(--red),rgba(255,255,255,.07));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 36px rgba(255,0,0,.52));animation:tpls 3s ease-in-out infinite alternate;letter-spacing:.06em;}
+.srpl{margin:2.8rem auto;width:92px;height:92px;background:rgba(255,0,0,.07);border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;animation:plp 2.2s ease-in-out infinite;}
+@keyframes plp{0%,100%{box-shadow:0 0 36px rgba(255,0,0,.26),0 0 0 0 rgba(255,0,0,.18);}50%{box-shadow:0 0 55px rgba(255,0,0,.52),0 0 0 16px rgba(255,0,0,0);}}
+.srpl:hover{background:rgba(255,0,0,.25);box-shadow:0 0 70px var(--red);transform:scale(1.1);}
+.srpl::after{content:'';border-left:32px solid #fff;border-top:20px solid transparent;border-bottom:20px solid transparent;margin-left:7px;}
+.srsub{font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:.4em;color:rgba(255,255,255,.32);}
+
+/* ── PRICING ── */
+#pricing{background:#000;}
+.pcg{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:1.8rem;max-width:940px;margin:0 auto;}
+.pcc{background:#020000;border:1px solid rgba(255,0,0,.1);border-radius:4px;padding:2.4rem;text-align:center;position:relative;overflow:hidden;transition:all .4s;}
+.pcc.feat{border-color:rgba(255,0,0,.42);background:linear-gradient(180deg,rgba(71,2,2,.16),#020000);box-shadow:0 0 52px rgba(255,0,0,.1);}
+.pcc:hover{transform:translateY(-8px);border-color:rgba(255,0,0,.52);box-shadow:0 18px 65px rgba(255,0,0,.2);}
+.fbdg{position:absolute;top:.9rem;right:.9rem;padding:.26rem .72rem;background:var(--red);font-family:'Orbitron',monospace;font-size:.5rem;letter-spacing:.16em;border-radius:2px;box-shadow:0 0 11px var(--red);}
+.pplan{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.26em;color:var(--red);margin-bottom:.42rem;}
+.pnam{font-family:'Cinzel',serif;font-size:1.38rem;color:#fff;margin-bottom:1.35rem;}
+.pamt{font-family:'Cinzel',serif;font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#fff,var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.38rem;}
+.pper{font-size:.76rem;color:rgba(255,255,255,.32);margin-bottom:1.85rem;}
+.pfl{list-style:none;margin-bottom:1.85rem;text-align:left;}
+.pfl li{padding:.52rem 0;border-bottom:1px solid rgba(255,0,0,.042);color:rgba(255,255,255,.62);font-size:.88rem;display:flex;align-items:center;gap:.62rem;}
+.pfl li::before{content:'▸';color:var(--red);font-size:.62rem;flex-shrink:0;}
+
+/* ── ORDER ── */
+#order{background:linear-gradient(180deg,#000,rgba(41,1,1,.15),#000);}
+.ocon{max-width:760px;margin:0 auto;background:rgba(2,0,0,.92);border:1px solid rgba(255,0,0,.16);border-radius:4px;padding:2.8rem;box-shadow:0 0 65px rgba(255,0,0,.07);}
+.stind{display:flex;justify-content:center;margin-bottom:2.8rem;}
+.sdot{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;max-width:105px;}
+.sdot::after{content:'';position:absolute;top:17px;left:57%;width:86%;height:1px;background:rgba(255,0,0,.16);}
+.sdot:last-child::after{display:none;}
+.snum{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,0,0,.22);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:.6rem;color:rgba(255,255,255,.32);background:#000;position:relative;z-index:1;transition:all .3s;}
+.sdot.act .snum{border-color:var(--red);color:#fff;background:rgba(255,0,0,.16);box-shadow:0 0 16px rgba(255,0,0,.32);}
+.sdot.done .snum{background:var(--red);border-color:var(--red);color:#fff;}
+.slbl{font-family:'Orbitron',monospace;font-size:.46rem;letter-spacing:.1em;color:rgba(255,255,255,.22);margin-top:.42rem;text-align:center;}
+.sdot.act .slbl{color:rgba(255,140,140,.7);}
+.ostep{display:none;}
+.ostep.act{display:block;animation:fup .4s ease forwards;opacity:0;}
+.stit2{font-family:'Cinzel',serif;font-size:1.42rem;color:#fff;margin-bottom:1.85rem;text-align:center;}
+.fg{display:flex;flex-direction:column;gap:.42rem;margin-bottom:.88rem;}
+.fl{font-family:'Orbitron',monospace;font-size:.54rem;letter-spacing:.18em;color:rgba(255,128,128,.62);}
+.fi,.fsel,.fta{background:rgba(0,0,0,.88);border:1px solid rgba(255,0,0,.16);border-radius:2px;padding:.72rem 1rem;color:#fff;font-family:'Rajdhani',sans-serif;font-size:1rem;outline:none;transition:all .3s;width:100%;}
+.fi:focus,.fsel:focus,.fta:focus{border-color:var(--red);box-shadow:0 0 16px rgba(255,0,0,.16);}
+.fi::placeholder,.fta::placeholder{color:rgba(255,255,255,.16);}
+.fsel option{background:#040000;}
+.fta{resize:vertical;min-height:92px;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:.88rem;}
+.sslct{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.72rem;}
+.sopt{padding:.88rem;border:1px solid rgba(255,0,0,.1);border-radius:3px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(0,0,0,.6);}
+.sopt:hover,.sopt.sel{border-color:var(--red);background:rgba(255,0,0,.08);box-shadow:0 0 16px rgba(255,0,0,.16);}
+.sopt .ico{font-size:1.38rem;margin-bottom:.38rem;}
+.sopt .nm{font-family:'Orbitron',monospace;font-size:.48rem;letter-spacing:.12em;color:rgba(255,255,255,.62);}
+.sopt.sel .nm{color:rgba(255,160,160,.88);}
+.upz{border:2px dashed rgba(255,0,0,.22);border-radius:4px;padding:2.4rem;text-align:center;cursor:pointer;transition:all .3s;background:rgba(0,0,0,.28);}
+.upz:hover,.upz.dov{border-color:var(--red);background:rgba(255,0,0,.04);}
+.upz .ui{font-size:2.6rem;margin-bottom:.85rem;display:block;}
+.upt{color:rgba(255,255,255,.42);font-size:.88rem;line-height:1.7;}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:.72rem;}
+.mopt{padding:.72rem;border:1px solid rgba(255,0,0,.1);border-radius:3px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(0,0,0,.5);}
+.mopt:hover,.mopt.sel{border-color:var(--red);background:rgba(255,0,0,.08);}
+.mopt .me{font-size:1.35rem;margin-bottom:.26rem;}
+.mopt .ml{font-family:'Orbitron',monospace;font-size:.48rem;letter-spacing:.1em;color:rgba(255,255,255,.52);}
+.osum{background:rgba(255,0,0,.04);border:1px solid rgba(255,0,0,.1);border-radius:4px;padding:1.35rem;margin-bottom:1.75rem;}
+.osr{display:flex;gap:.5rem;padding:.42rem 0;border-bottom:1px solid rgba(255,0,0,.055);font-size:.88rem;color:rgba(255,255,255,.62);}
+.osr:last-child{border-bottom:none;}
+.osk{color:rgba(255,100,100,.48);min-width:95px;font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.1em;align-self:center;}
+.obtns{display:flex;justify-content:space-between;margin-top:1.75rem;gap:.88rem;}
+.bbk{background:transparent;border:1px solid rgba(255,0,0,.22);padding:.72rem 1.85rem;color:rgba(255,255,255,.52);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:.18em;cursor:pointer;transition:all .3s;border-radius:2px;}
+.bbk:hover{border-color:var(--red);color:#fff;}
+.fitem{padding:.38rem .72rem;background:rgba(255,0,0,.04);border:1px solid rgba(255,0,0,.07);border-radius:2px;margin-bottom:.26rem;font-size:.8rem;color:rgba(255,255,255,.52);}
+
+/* ── PREMIUM ── */
+#prem{background:#000;text-align:center;}
+.prbox{max-width:560px;margin:0 auto;background:rgba(71,2,2,.07);border:1px solid rgba(255,0,0,.16);border-radius:4px;padding:2.8rem;box-shadow:0 0 65px rgba(255,0,0,.07);}
+.prico{font-size:3.7rem;margin-bottom:1.35rem;display:block;filter:drop-shadow(0 0 16px rgba(255,0,0,.52));}
+.prtit{font-family:'Cinzel',serif;font-size:1.85rem;color:#fff;margin-bottom:.42rem;}
+.prds{color:rgba(255,255,255,.45);margin-bottom:1.85rem;font-size:.9rem;line-height:1.75;}
+.prfl{display:flex;flex-wrap:wrap;gap:.42rem;justify-content:center;margin-bottom:1.85rem;}
+.prf{padding:.32rem .85rem;background:rgba(255,0,0,.06);border:1px solid rgba(255,0,0,.12);border-radius:2px;font-family:'Orbitron',monospace;font-size:.5rem;letter-spacing:.16em;color:rgba(255,150,150,.72);}
+.prir{display:flex;gap:.42rem;}
+.prst{margin-top:.88rem;font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:.18em;min-height:1.4em;transition:all .3s;}
+.prst.ok{color:#00ff88;}
+.prst.err{color:var(--red);}
+#premcnt{display:none;margin-top:1.9rem;padding:1.5rem;background:rgba(255,0,0,.05);border:1px solid rgba(255,0,0,.18);border-radius:4px;text-align:left;}
+
+/* ── TESTIMONIALS ── */
+#test{background:linear-gradient(180deg,#000,rgba(41,1,1,.1),#000);overflow:hidden;}
+.ttrk{display:flex;gap:1.75rem;animation:scrt 28s linear infinite;width:max-content;}
+.ttrk:hover{animation-play-state:paused;}
+@keyframes scrt{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.tcrd{min-width:298px;max-width:298px;background:#030000;border:1px solid rgba(255,0,0,.1);border-radius:4px;padding:1.85rem;flex-shrink:0;transition:all .3s;}
+.tcrd:hover{border-color:rgba(255,0,0,.35);box-shadow:0 0 32px rgba(255,0,0,.1);}
+.tst{color:var(--red);font-size:.92rem;margin-bottom:.85rem;letter-spacing:.16em;}
+.ttxt{color:rgba(255,255,255,.62);font-size:.88rem;line-height:1.7;font-style:italic;margin-bottom:1.35rem;}
+.tau{display:flex;align-items:center;gap:.85rem;}
+.tav{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#470202,#ff0000);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;color:#fff;box-shadow:0 0 11px rgba(255,0,0,.32);flex-shrink:0;}
+.tnm{font-family:'Cinzel',serif;font-size:.85rem;color:#fff;}
+.trl{font-family:'Orbitron',monospace;font-size:.5rem;letter-spacing:.16em;color:rgba(255,100,100,.52);}
+
+/* ── CONTACT ── */
+#contact{background:#000;}
+.cg{display:grid;grid-template-columns:1fr 1.5fr;gap:3.8rem;max-width:940px;margin:0 auto;align-items:start;}
+.ch3{font-family:'Cinzel',serif;font-size:1.7rem;color:#fff;margin-bottom:1.85rem;line-height:1.3;}
+.citem{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.75rem;}
+.cico{width:40px;height:40px;background:rgba(255,0,0,.07);border:1px solid rgba(255,0,0,.16);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0;}
+.clbl{font-family:'Orbitron',monospace;font-size:.5rem;letter-spacing:.18em;color:rgba(255,100,100,.52);margin-bottom:.26rem;}
+.cdet,.cdet a{color:rgba(255,255,255,.62);text-decoration:none;font-size:.92rem;transition:.3s;}
+.cdet a:hover{color:var(--red);}
+.socls{display:flex;gap:.85rem;margin-top:1.85rem;}
+.socl{width:40px;height:40px;background:rgba(255,0,0,.05);border:1px solid rgba(255,0,0,.16);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;text-decoration:none;color:#fff;transition:all .3s;}
+.socl:hover{background:rgba(255,0,0,.16);border-color:var(--red);box-shadow:0 0 16px rgba(255,0,0,.26);transform:translateY(-3px);}
+.cform{background:rgba(2,0,0,.92);border:1px solid rgba(255,0,0,.1);border-radius:4px;padding:2.4rem;}
+.csuc{display:none;text-align:center;padding:2rem;color:#00ff88;font-family:'Orbitron',monospace;font-size:.68rem;letter-spacing:.16em;line-height:2.2;}
+
+/* ── FOOTER ── */
+footer{background:#000;border-top:1px solid rgba(255,0,0,.07);padding:3rem 5vw 1.75rem;}
+.ftop{display:grid;grid-template-columns:2fr 1fr 1fr;gap:2.8rem;margin-bottom:2.8rem;}
+.fbr p{color:rgba(255,255,255,.35);font-size:.88rem;line-height:1.72;max-width:285px;margin-top:.85rem;}
+.fcol h4{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.26em;color:var(--red);margin-bottom:1.35rem;}
+.fls{list-style:none;}
+.fls li{margin-bottom:.62rem;}
+.fls a{color:rgba(255,255,255,.35);text-decoration:none;font-size:.86rem;transition:all .3s;}
+.fls a:hover{color:#fff;padding-left:5px;}
+.fbot{display:flex;justify-content:space-between;align-items:center;padding-top:1.85rem;border-top:1px solid rgba(255,0,0,.055);flex-wrap:wrap;gap:.85rem;}
+.fcp{font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.16em;color:rgba(255,255,255,.25);}
+.fcp span{color:var(--red);}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(26px);transition:all .88s cubic-bezier(.16,1,.3,1);}
+.rv.vis{opacity:1;transform:translateY(0);}
+
+/* ── LOADING OVERLAY ── */
+#lovl{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:99000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;}
+#lovl.show{display:flex;}
+.lovt{font-family:'Orbitron',monospace;font-size:.85rem;letter-spacing:.3em;color:var(--red);animation:tpls 1.5s infinite alternate;}
+.lovrng{width:56px;height:56px;border:3px solid rgba(255,0,0,.18);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:.88rem 1.4rem;}
+  .nls{display:none;}
+  .ww{display:none;}
+  .hc{padding:0 1.4rem;max-width:100%;}
+  .htit{font-size:2.4rem;}
+  .cg,.ftop{grid-template-columns:1fr;}
+  .fr2{grid-template-columns:1fr;}
+  .ocon{padding:1.6rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="curt"></div>
+<canvas id="pc"></canvas>
+
+<!-- ══════════ INTRO ══════════ -->
+<div id="intro">
+  <div class="ibg"></div>
+  <div class="ipts" id="ipts"></div>
+  <div class="ilogo">
+    <div class="ititl">XE Studio</div>
+    <div class="isub">CINEMATIC EDITING UNIVERSE</div>
+  </div>
+  <div class="idiv"></div>
+  <div class="ifrm">
+    <label for="uinp">ENTER YOUR NAME TO ENTER THE REALM</label>
+    <input type="text" id="uinp" class="iinp" placeholder="Your name..." maxlength="30" autocomplete="off">
+    <button class="ibtn" id="enterbtn">⚡ ENTER THE STUDIO</button>
+  </div>
+</div>
+
+<!-- ══════════ MAIN ══════════ -->
+<div id="main">
+
+<nav id="nav">
+  <a href="#hero" class="nlo">XE Studio</a>
+  <ul class="nls">
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#styles">Styles</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#order">Order</a></li>
+    <li><a href="#prem">Premium</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nusr" id="nusr">WELCOME</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hbg"></div>
+  <div class="hgrid"></div>
+
+  <!-- SCARLET WITCH (uploaded image — background removed PNG) -->
+  <div class="ww" id="ww">
+    <div class="wglw"></div>
+    <div style="position:absolute;bottom:33%;right:47%;">
+      <div class="ern"></div><div class="ern"></div><div class="ern"></div>
+    </div>
+    <div style="position:absolute;bottom:31%;right:31%;">
+      <div class="ern"></div><div class="ern"></div><div class="ern"></div>
+    </div>
+    <div class="eorb l"></div>
+    <div class="eorb r"></div>
+    <!-- Using the uploaded image via object URL set by JS, with wikia fallback -->
+    <img id="wimg" class="wimg" alt="Scarlet Witch – XE Studio" src="https://static.wikia.nocookie.net/villains/images/c/c4/Scarlet_Witch_DS.webp/revision/latest?cb=20220529072343" onerror="this.style.display='none'">
+    <div id="wsps"></div>
+  </div>
+
+  <div class="hc">
+    <div class="hbdg">CINEMATIC EDITING STUDIO</div>
+    <h1 class="htit">
+      <span class="l1">XE Studio</span>
+      <span class="l2">Cinematic Editing</span>
+    </h1>
+    <p class="hdsc">Where raw footage becomes legend. Producer <strong style="color:rgba(255,160,160,.88);">Braj Dev</strong> crafts visual stories that bleed emotion, burn with energy, and transcend the ordinary.</p>
+    <div class="hbs">
+      <a href="#portfolio" class="bp">View My Work</a>
+      <a href="#order" class="bs">Order Your Edit</a>
+    </div>
+  </div>
+  <div class="scri"><div class="scrl"></div><span class="scrt">SCROLL DOWN</span></div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="sh rv"><span class="stg">— SHOWCASE —</span><h2 class="stit">Portfolio</h2><div class="sln"></div><p class="sdsc">A glimpse into the dark cinematic universe crafted by Braj Dev</p></div>
+  <div class="pgrid rv">
+    <div class="vc" onclick="openMod('Dark Cinematic Edit')">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#060000,#160000,#340000);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;"><span style="font-size:2.7rem;filter:drop-shadow(0 0 13px rgba(255,0,0,.8))">🎬</span><span style="font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.2em;color:rgba(255,100,100,.52)">CINEMATIC REEL</span></div>
+      <div class="vpl"></div><div class="vov"><div class="vtit">Dark Cinematic Edit</div><div class="vmeta">CINEMATIC • 4K • 2024</div></div>
+    </div>
+    <div class="vc" onclick="openMod('Love Story Edit')">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#070000,#230000,#480000);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;"><span style="font-size:2.7rem;filter:drop-shadow(0 0 13px rgba(255,0,0,.8))">❤️‍🔥</span><span style="font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.2em;color:rgba(255,100,100,.52)">LOVE STORY</span></div>
+      <div class="vpl"></div><div class="vov"><div class="vtit">Love Story Edit</div><div class="vmeta">ROMANTIC • CINEMATIC</div></div>
+    </div>
+    <div class="vc" onclick="openMod('Travel Story Edit')">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#000,#070707,#0e0007);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;"><span style="font-size:2.7rem;filter:drop-shadow(0 0 13px rgba(255,0,0,.8))">✈️</span><span style="font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.2em;color:rgba(255,100,100,.52)">TRAVEL STORY</span></div>
+      <div class="vpl"></div><div class="vov"><div class="vtit">Travel Story Edit</div><div class="vmeta">TRAVEL • ADVENTURE</div></div>
+    </div>
+    <div class="vc" onclick="openMod('Instagram Reel Edit')">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#070000,#160000,#320000);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;"><span style="font-size:2.7rem;filter:drop-shadow(0 0 13px rgba(255,0,0,.8))">📱</span><span style="font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.2em;color:rgba(255,100,100,.52)">INSTAGRAM REEL</span></div>
+      <div class="vpl"></div><div class="vov"><div class="vtit">Instagram Reel</div><div class="vmeta">REEL • TRENDING</div></div>
+    </div>
+    <div class="vc" onclick="openMod('Sad Edit')">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#000,#03030f,#07071e);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;"><span style="font-size:2.7rem;filter:drop-shadow(0 0 13px rgba(100,100,255,.8))">🌧️</span><span style="font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.2em;color:rgba(150,150,255,.52)">SAD EDIT</span></div>
+      <div class="vpl"></div><div class="vov"><div class="vtit">Sad Edit</div><div class="vmeta">EMOTIONAL • DEEP</div></div>
+    </div>
+    <div class="vc" onclick="openMod('Funk Edit')">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#060000,#100300,#1c0700);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;"><span style="font-size:2.7rem;filter:drop-shadow(0 0 13px rgba(255,140,0,.8))">🔥</span><span style="font-family:'Orbitron',monospace;font-size:.52rem;letter-spacing:.2em;color:rgba(255,180,100,.52)">FUNK EDIT</span></div>
+      <div class="vpl"></div><div class="vov"><div class="vtit">Funk Edit</div><div class="vmeta">HYPE • ENERGETIC</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDITING STYLES -->
+<section id="styles">
+  <div class="sh rv"><span class="stg">— WHAT WE CREATE —</span><h2 class="stit">Editing Styles</h2><div class="sln"></div><p class="sdsc">Every frame is a canvas. Every cut is a statement.</p></div>
+  <div class="sgrid">
+    <div class="scard rv"><span class="sico">🎬</span><div class="stbg">SIGNATURE</div><div class="snm">Cinematic Edit</div><div class="sdsc2">Hollywood-grade color grading, dramatic transitions, and powerful soundscapes that transform ordinary footage into pure cinema.</div><div class="smt"><span class="spr">₹599 – ₹999</span><span class="sdl">⏱ 2–3 days</span></div></div>
+    <div class="scard rv"><span class="sico">🔥</span><div class="stbg">HYPE</div><div class="snm">Funk Edit</div><div class="sdsc2">High-energy cuts synced to bass drops and beats. Perfect for showcasing personality, attitude, and raw energy.</div><div class="smt"><span class="spr">₹499 – ₹799</span><span class="sdl">⏱ 1–2 days</span></div></div>
+    <div class="scard rv"><span class="sico">🌧️</span><div class="stbg">EMOTIONAL</div><div class="snm">Sad Edit</div><div class="sdsc2">Soul-piercing visuals with melancholic tones, color-drained palettes, and haunting music choices that evoke raw emotion.</div><div class="smt"><span class="spr">₹499 – ₹699</span><span class="sdl">⏱ 1–2 days</span></div></div>
+    <div class="scard rv"><span class="sico">❤️‍🔥</span><div class="stbg">ROMANTIC</div><div class="snm">Love Story Edit</div><div class="sdsc2">Warm golden tones, tender transitions, and romantic overlays that capture the essence of love in every frame.</div><div class="smt"><span class="spr">₹699 – ₹1199</span><span class="sdl">⏱ 2–4 days</span></div></div>
+    <div class="scard rv"><span class="sico">✈️</span><div class="stbg">ADVENTURE</div><div class="snm">Travel Story Edit</div><div class="sdsc2">Wanderlust-inducing edits that make every landscape breathtaking and every journey feel epic and unforgettable.</div><div class="smt"><span class="spr">₹799 – ₹1499</span><span class="sdl">⏱ 3–5 days</span></div></div>
+    <div class="scard rv"><span class="sico">🦋</span><div class="stbg">REBIRTH</div><div class="snm">Move On Edit</div><div class="sdsc2">A visual journey of transformation — from darkness to light. Powerful, uplifting, and deeply personal storytelling.</div><div class="smt"><span class="spr">₹599 – ₹999</span><span class="sdl">⏱ 2–3 days</span></div></div>
+    <div class="scard rv"><span class="sico">📱</span><div class="stbg">TRENDING</div><div class="snm">Instagram Reel Edit</div><div class="sdsc2">Scroll-stopping vertical content with trending transitions, text animations, and viral energy. Maximum engagement guaranteed.</div><div class="smt"><span class="spr">₹299 – ₹599</span><span class="sdl">⏱ 24 hrs</span></div></div>
+  </div>
+</section>
+
+<!-- BEFORE/AFTER -->
+<section id="ba">
+  <div class="sh rv"><span class="stg">— THE TRANSFORMATION —</span><h2 class="stit">Before / After</h2><div class="sln"></div><p class="sdsc">Drag the slider to witness the power of cinematic editing</p></div>
+  <div class="bac rv">
+    <div class="basl" id="basl">
+      <div class="bapn bab" id="bab" style="width:50%;"><div class="balb b">RAW FOOTAGE</div><div class="baraw">RAW</div></div>
+      <div class="bapn baa" id="baa" style="left:50%;right:0;"><div class="balb a">CINEMATIC EDIT</div><div class="baedt">CINEMATIC</div></div>
+      <div class="baht" id="baht" style="left:50%;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWREEL -->
+<section id="sr">
+  <div class="srbg"></div>
+  <div class="srln"></div><div class="srln"></div><div class="srln"></div>
+  <div class="srcon">
+    <div class="srtit rv">SHOWREEL</div>
+    <p class="srsub rv" style="transition-delay:.15s">2024 — BRAJ DEV — XE STUDIO</p>
+    <div class="srpl rv" style="transition-delay:.3s" onclick="openMod('XE Studio Showreel 2024')"></div>
+    <p class="srsub rv" style="transition-delay:.45s">CLICK TO PLAY</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="sh rv"><span class="stg">— INVESTMENT —</span><h2 class="stit">Pricing</h2><div class="sln"></div><p class="sdsc">Transparent pricing for extraordinary results</p></div>
+  <div class="pcg">
+    <div class="pcc rv"><div class="pplan">TIER 01</div><div class="pnam">Basic Edit</div><div class="pamt">₹299</div><div class="pper">Per short video / reel</div><ul class="pfl"><li>Up to 60 seconds</li><li>Basic color correction</li><li>Music sync</li><li>Text overlays</li><li>1 revision</li><li>24–48 hr delivery</li></ul><a href="#order" class="bs" style="display:block;text-align:center;">Order Now</a></div>
+    <div class="pcc feat rv"><div class="fbdg">POPULAR</div><div class="pplan">TIER 02</div><div class="pnam">Cinematic Edit</div><div class="pamt">₹799</div><div class="pper">Per cinematic short film</div><ul class="pfl"><li>Up to 3 minutes</li><li>Pro color grading</li><li>Cinematic transitions</li><li>Sound design</li><li>Motion graphics</li><li>2–3 revisions</li><li>3–5 day delivery</li></ul><a href="#order" class="bp" style="display:block;text-align:center;clip-path:none;border-radius:2px;">Order Now</a></div>
+    <div class="pcc rv"><div class="pplan">TIER 03</div><div class="pnam">Premium Story Edit</div><div class="pamt">₹1499</div><div class="pper">Full story production</div><ul class="pfl"><li>Up to 10 minutes</li><li>Full cinematic treatment</li><li>Custom music selection</li><li>Advanced VFX</li><li>Color + grade mastering</li><li>Unlimited revisions</li><li>Priority delivery</li></ul><a href="#order" class="bs" style="display:block;text-align:center;">Order Now</a></div>
+  </div>
+</section>
+
+<!-- ORDER -->
+<section id="order">
+  <div class="sh rv"><span class="stg">— BEGIN YOUR JOURNEY —</span><h2 class="stit">Order Your Edit</h2><div class="sln"></div><p class="sdsc">Fill in the steps and your order details will be sent directly to Braj Dev at brajd34@gmail.com</p></div>
+  <div class="ocon rv">
+    <div class="stind">
+      <div class="sdot act" data-s="1"><div class="snum">01</div><span class="slbl">STYLE</span></div>
+      <div class="sdot" data-s="2"><div class="snum">02</div><span class="slbl">INFO</span></div>
+      <div class="sdot" data-s="3"><div class="snum">03</div><span class="slbl">DESCRIBE</span></div>
+      <div class="sdot" data-s="4"><div class="snum">04</div><span class="slbl">MOOD</span></div>
+      <div class="sdot" data-s="5"><div class="snum">05</div><span class="slbl">SUBMIT</span></div>
+    </div>
+    <!-- Step 1 -->
+    <div class="ostep act" id="st1">
+      <h3 class="stit2">Choose Your Editing Style</h3>
+      <div class="sslct" id="ssel">
+        <div class="sopt" data-v="Cinematic Edit"><div class="ico">🎬</div><div class="nm">CINEMATIC</div></div>
+        <div class="sopt" data-v="Funk Edit"><div class="ico">🔥</div><div class="nm">FUNK</div></div>
+        <div class="sopt" data-v="Sad Edit"><div class="ico">🌧️</div><div class="nm">SAD</div></div>
+        <div class="sopt" data-v="Love Story Edit"><div class="ico">❤️‍🔥</div><div class="nm">LOVE STORY</div></div>
+        <div class="sopt" data-v="Travel Story Edit"><div class="ico">✈️</div><div class="nm">TRAVEL</div></div>
+        <div class="sopt" data-v="Move On Edit"><div class="ico">🦋</div><div class="nm">MOVE ON</div></div>
+        <div class="sopt" data-v="Instagram Reel Edit"><div class="ico">📱</div><div class="nm">REEL</div></div>
+      </div>
+      <div class="obtns" style="justify-content:flex-end;"><button class="bp" style="clip-path:none;border-radius:2px;" onclick="goStep(2)">NEXT →</button></div>
+    </div>
+    <!-- Step 2 -->
+    <div class="ostep" id="st2">
+      <h3 class="stit2">Your Details & Files</h3>
+      <div class="fg"><label class="fl">YOUR NAME *</label><input type="text" class="fi" id="oname" placeholder="Full name"></div>
+      <div class="fg"><label class="fl">YOUR EMAIL *</label><input type="email" class="fi" id="oemail" placeholder="your@email.com"></div>
+      <div class="fg"><label class="fl">PHONE / WHATSAPP</label><input type="text" class="fi" id="ophone" placeholder="+91 XXXXXXXXXX"></div>
+      <div class="fg"><label class="fl">FILE SHARING LINKS (Google Drive / WeTransfer / etc.)</label><input type="text" class="fi" id="olinks" placeholder="Paste your drive/sharing links here"></div>
+      <div class="upz" id="upz"><span class="ui">📁</span><div class="upt">Drop files here or click to browse<br><small style="opacity:.42">For large files, use drive links above</small></div><input type="file" id="finp" multiple accept="video/*,image/*" style="display:none"></div>
+      <div id="flist" style="margin-top:.65rem;"></div>
+      <div class="obtns"><button class="bbk" onclick="goStep(1)">← BACK</button><button class="bp" style="clip-path:none;border-radius:2px;" onclick="goStep(3)">NEXT →</button></div>
+    </div>
+    <!-- Step 3 -->
+    <div class="ostep" id="st3">
+      <h3 class="stit2">Describe Your Vision</h3>
+      <div class="fg"><label class="fl">EDIT DESCRIPTION *</label><textarea class="fta" id="odesc" placeholder="Describe what you want — theme, mood, scenes, special effects, transitions, references..." style="min-height:135px;"></textarea></div>
+      <div class="fr2">
+        <div class="fg"><label class="fl">VIDEO LENGTH</label><select class="fsel" id="olen"><option value="">Select</option><option>30 seconds</option><option>1 minute</option><option>2–3 minutes</option><option>5+ minutes</option></select></div>
+        <div class="fg"><label class="fl">DELIVERY PLATFORM</label><select class="fsel" id="oplat"><option value="">Select</option><option>Instagram Reel</option><option>YouTube</option><option>WhatsApp Status</option><option>Personal Use</option><option>Other</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">REFERENCE VIDEO LINKS (optional)</label><input type="text" class="fi" id="oref" placeholder="YouTube/Instagram reference links"></div>
+      <div class="obtns"><button class="bbk" onclick="goStep(2)">← BACK</button><button class="bp" style="clip-path:none;border-radius:2px;" onclick="goStep(4)">NEXT →</button></div>
+    </div>
+    <!-- Step 4 -->
+    <div class="ostep" id="st4">
+      <h3 class="stit2">Select Mood & Music Style</h3>
+      <div class="mgrid">
+        <div class="mopt" data-v="Dark &amp; Intense"><div class="me">🌑</div><div class="ml">DARK &amp; INTENSE</div></div>
+        <div class="mopt" data-v="Emotional &amp; Sad"><div class="me">💔</div><div class="ml">EMOTIONAL</div></div>
+        <div class="mopt" data-v="Romantic &amp; Warm"><div class="me">💕</div><div class="ml">ROMANTIC</div></div>
+        <div class="mopt" data-v="Hype &amp; Energetic"><div class="me">⚡</div><div class="ml">HYPE</div></div>
+        <div class="mopt" data-v="Calm &amp; Peaceful"><div class="me">🌊</div><div class="ml">CALM</div></div>
+        <div class="mopt" data-v="Epic &amp; Powerful"><div class="me">🔱</div><div class="ml">EPIC</div></div>
+        <div class="mopt" data-v="Happy &amp; Joyful"><div class="me">🌟</div><div class="ml">HAPPY</div></div>
+        <div class="mopt" data-v="Nostalgic"><div class="me">🌅</div><div class="ml">NOSTALGIC</div></div>
+      </div>
+      <div class="fg" style="margin-top:1.35rem;"><label class="fl">SPECIFIC SONG REQUEST (optional)</label><input type="text" class="fi" id="osong" placeholder="Song name / artist name"></div>
+      <div class="obtns"><button class="bbk" onclick="goStep(3)">← BACK</button><button class="bp" style="clip-path:none;border-radius:2px;" onclick="goStep(5)">NEXT →</button></div>
+    </div>
+    <!-- Step 5 -->
+    <div class="ostep" id="st5">
+      <h3 class="stit2">Review & Submit Order</h3>
+      <div class="osum" id="osum"></div>
+      <div class="fg"><label class="fl">ADDITIONAL NOTES</label><textarea class="fta" id="onotes" placeholder="Any final notes for Braj Dev..."></textarea></div>
+      <div class="obtns"><button class="bbk" onclick="goStep(4)">← BACK</button><button class="bp" style="clip-path:none;border-radius:2px;" id="subbtn" onclick="submitOrder()">⚡ SUBMIT ORDER</button></div>
+      <div id="osuc" style="display:none;text-align:center;padding:1.8rem;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIUM -->
+<section id="prem">
+  <div class="sh rv"><span class="stg">— EXCLUSIVE ACCESS —</span><h2 class="stit">Premium Membership</h2><div class="sln"></div></div>
+  <div class="prbox rv">
+    <span class="prico">👑</span>
+    <div class="prtit">Unlock the Vault</div>
+    <div class="prds">Enter the exclusive code provided by Braj Dev to unlock premium content, behind-the-scenes footage, editing presets, priority orders, and a free edit access.</div>
+    <div class="prfl">
+      <span class="prf">EXCLUSIVE PRESETS</span><span class="prf">PRIORITY ORDERS</span><span class="prf">BTS CONTENT</span>
+      <span class="prf">DISCOUNT CODES</span><span class="prf">FREE EDIT ACCESS</span><span class="prf">DIRECT ACCESS</span>
+    </div>
+    <div class="prir">
+      <input type="text" class="fi" id="prcode" placeholder="ENTER PREMIUM CODE" style="letter-spacing:.2em;text-transform:uppercase;" onkeypress="if(event.key==='Enter')checkPrem()">
+      <button class="bp" onclick="checkPrem()" style="clip-path:none;border-radius:2px;white-space:nowrap;padding:.72rem 1.35rem;">UNLOCK</button>
+    </div>
+    <div class="prst" id="prst"></div>
+    <div id="premcnt" style="display:none;margin-top:1.85rem;padding:1.5rem;background:rgba(255,0,0,.05);border:1px solid rgba(255,0,0,.18);border-radius:4px;text-align:left;">
+      <div style="font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:.28em;color:#00ff88;margin-bottom:1rem;">✅ PREMIUM ACCESS GRANTED — WELCOME TO THE VAULT</div>
+      <div style="color:rgba(255,255,255,.58);font-size:.88rem;line-height:2;">
+        🔥 You now have <strong style="color:#fff;">full premium access</strong> to XE Studio.<br>
+        👑 Priority orders — your edits go to the front of the queue.<br>
+        🎬 Exclusive color presets &amp; LUTs by Braj Dev.<br>
+        📽 Behind-the-scenes editing breakdowns.<br>
+        💰 20% discount on all orders — use code <span style="color:var(--red);font-family:'Orbitron',monospace;letter-spacing:.1em;">PREMXE</span> when ordering.<br>
+        📲 Direct WhatsApp: <a href="https://wa.me/919329019647" target="_blank" style="color:var(--red);">+91 9329019647</a><br>
+        📧 Direct email: <a href="mailto:brajd34@gmail.com" style="color:var(--red);">brajd34@gmail.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="test">
+  <div class="sh rv"><span class="stg">— CLIENT VOICES —</span><h2 class="stit">Testimonials</h2><div class="sln"></div></div>
+  <div style="overflow:hidden;"><div class="ttrk" id="ttrk"></div></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="sh rv"><span class="stg">— GET IN TOUCH —</span><h2 class="stit">Contact</h2><div class="sln"></div></div>
+  <div class="cg">
+    <div class="rv">
+      <h3 class="ch3">Let's Create<br>Something Legendary</h3>
+      <div class="citem"><div class="cico">📧</div><div><div class="clbl">EMAIL</div><div class="cdet"><a href="mailto:brajd34@gmail.com">brajd34@gmail.com</a></div></div></div>
+      <div class="citem"><div class="cico">📞</div><div><div class="clbl">PHONE / WHATSAPP</div><div class="cdet"><a href="tel:+919329019647">+91 9329019647</a></div></div></div>
+      <div class="citem"><div class="cico">📍</div><div><div class="clbl">STUDIO</div><div class="cdet">India — XE Studio by Braj Dev</div></div></div>
+      <div class="citem"><div class="cico">📸</div><div><div class="clbl">INSTAGRAM</div><div class="cdet"><a href="https://www.instagram.com/x____brajdev____4694?igsh=MWR5dmF5Nnp2NWI5cA==" target="_blank">@x____brajdev____4694</a></div></div></div>
+      <div class="socls">
+        <a href="https://www.instagram.com/x____brajdev____4694?igsh=MWR5dmF5Nnp2NWI5cA==" target="_blank" class="socl">📸</a>
+        <a href="mailto:brajd34@gmail.com" class="socl">📧</a>
+        <a href="https://wa.me/919329019647" target="_blank" class="socl">💬</a>
+      </div>
+    </div>
+    <div class="cform rv">
+      <div class="csuc" id="csuc"></div>
+      <div id="cfrm">
+        <div class="fr2">
+          <div class="fg"><label class="fl">YOUR NAME *</label><input type="text" class="fi" id="cn" placeholder="Your name"></div>
+          <div class="fg"><label class="fl">YOUR EMAIL *</label><input type="email" class="fi" id="ce" placeholder="your@email.com"></div>
+        </div>
+        <div class="fg"><label class="fl">SUBJECT</label><input type="text" class="fi" id="cs" placeholder="What's this about?"></div>
+        <div class="fg"><label class="fl">MESSAGE *</label><textarea class="fta" id="cm" placeholder="Tell Braj Dev about your project..." style="min-height:125px;"></textarea></div>
+        <button class="bp" onclick="sendContact()" style="width:100%;text-align:center;clip-path:none;border-radius:2px;">⚡ SEND MESSAGE</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ftop">
+    <div class="fbr">
+      <a href="#hero" class="nlo" style="font-size:1.65rem;">XE Studio</a>
+      <p>Where raw footage becomes cinema. Braj Dev crafts visual stories that leave a permanent mark on the soul. Dark, powerful, unforgettable.</p>
+      <div class="socls" style="margin-top:1.35rem;">
+        <a href="https://www.instagram.com/x____brajdev____4694?igsh=MWR5dmF5Nnp2NWI5cA==" target="_blank" class="socl">📸</a>
+        <a href="mailto:brajd34@gmail.com" class="socl">📧</a>
+        <a href="https://wa.me/919329019647" target="_blank" class="socl">💬</a>
+      </div>
+    </div>
+    <div class="fcol"><h4>NAVIGATE</h4><ul class="fls"><li><a href="#hero">Home</a></li><li><a href="#portfolio">Portfolio</a></li><li><a href="#styles">Styles</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#order">Order</a></li><li><a href="#contact">Contact</a></li></ul></div>
+    <div class="fcol"><h4>SERVICES</h4><ul class="fls"><li><a href="#order">Cinematic Edit</a></li><li><a href="#order">Instagram Reels</a></li><li><a href="#order">Love Story Edit</a></li><li><a href="#order">Travel Edit</a></li><li><a href="#order">Funk Edit</a></li><li><a href="#prem">Premium Access</a></li></ul></div>
+  </div>
+  <div class="fbot">
+    <div class="fcp">© XE Studio – Produced by <span>Braj Dev</span>. All Rights Reserved.</div>
+    <div class="fcp">Crafted with 🔥 in India</div>
+  </div>
+</footer>
+
+</div><!-- /main -->
+
+<!-- VIDEO MODAL -->
+<div id="vmod">
+  <div class="minn">
+    <button class="mcls" onclick="closeMod()">✕</button>
+    <div class="mvid">
+      <div style="font-size:2.7rem;filter:drop-shadow(0 0 16px rgba(255,0,0,.8))">🎬</div>
+      <div id="mtit" style="font-family:'Cinzel',serif;font-size:1.35rem;color:#fff;"></div>
+      <div style="color:rgba(255,100,100,.45);font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:.18em;margin-top:.4rem;">UPLOAD YOUR WORK TO DISPLAY HERE</div>
+      <div style="margin-top:.9rem;"><a href="mailto:brajd34@gmail.com" style="color:var(--red);font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.16em;">brajd34@gmail.com</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="lovl">
+  <div class="lovrng"></div>
+  <div class="lovt" id="lovt">SENDING...</div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   XE STUDIO — MAIN JS
+   All orders & contact messages are sent
+   automatically to brajd34@gmail.com
+════════════════════════════════════════ */
+
+const OWNER_EMAIL = "brajd34@gmail.com";
+
+// ── CURSOR ──
+const cur = document.getElementById('cur');
+const curt = document.getElementById('curt');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx + 'px';
+  cur.style.top = my + 'px';
+});
+(function animCur(){
+  tx += (mx-tx)*.14; ty += (my-ty)*.14;
+  curt.style.left = tx + 'px'; curt.style.top = ty + 'px';
+  requestAnimationFrame(animCur);
+})();
+document.querySelectorAll('a,button,.sopt,.mopt,.vc,.bp,.bs,.srpl,.baht').forEach(el => {
+  el.addEventListener('mouseenter', () => cur.style.transform = 'translate(-50%,-50%) scale(2)');
+  el.addEventListener('mouseleave', () => cur.style.transform = 'translate(-50%,-50%) scale(1)');
+});
+
+// ── PARTICLES ──
+const cvs = document.getElementById('pc');
+const ctx = cvs.getContext('2d');
+function rz(){ cvs.width = innerWidth; cvs.height = innerHeight; }
+rz(); addEventListener('resize', rz);
+const pts = [];
+class Pt {
+  constructor(){ this.rs(); }
+  rs(){ this.x=Math.random()*cvs.width; this.y=Math.random()*cvs.height; this.s=Math.random()*1.7+.4; this.vx=(Math.random()-.5)*.38; this.vy=-Math.random()*.65-.15; this.op=Math.random()*.42+.1; this.life=1; this.dec=Math.random()*.0022+.001; }
+  upd(){ this.x+=this.vx; this.y+=this.vy; this.life-=this.dec; if(this.life<=0) this.rs(); }
+  drw(){ ctx.save(); ctx.globalAlpha=this.life*this.op; ctx.fillStyle=`hsl(${Math.random()<.88?0:15},100%,${50+Math.random()*28}%)`; ctx.shadowBlur=5; ctx.shadowColor='#ff0000'; ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+}
+for(let i=0;i<95;i++) pts.push(new Pt());
+(function ap(){ ctx.clearRect(0,0,cvs.width,cvs.height); pts.forEach(p=>{p.upd();p.drw();}); requestAnimationFrame(ap); })();
+
+// ── INTRO SPARKS ──
+const ipts = document.getElementById('ipts');
+for(let i=0;i<44;i++){
+  const s = document.createElement('div'); s.className='sp';
+  s.style.left = Math.random()*100+'%';
+  s.style.width = (Math.random()*3+1)+'px'; s.style.height = s.style.width;
+  s.style.animationDelay = Math.random()*3+'s';
+  s.style.animationDuration = (1.8+Math.random()*2.2)+'s';
+  ipts.appendChild(s);
+}
+
+// ── WITCH SPARKS ──
+const wsps = document.getElementById('wsps');
+for(let i=0;i<22;i++){
+  const s = document.createElement('div'); s.className='wsp';
+  const a=Math.random()*360, d=80+Math.random()*175;
+  s.style.left = (42+Math.cos(a*Math.PI/180)*12)+'%';
+  s.style.bottom = (18+Math.random()*52)+'%';
+  s.style.setProperty('--tx', (Math.cos(a*Math.PI/180)*d)+'px');
+  s.style.setProperty('--ty', (Math.sin(a*Math.PI/180)*d-75)+'px');
+  s.style.animationDuration = (1.2+Math.random()*1.7)+'s';
+  s.style.animationDelay = (Math.random()*2)+'s';
+  wsps.appendChild(s);
+}
+
+// ── ENTER SITE ──
+function enterSite(){
+  const nm = (document.getElementById('uinp').value.trim()||'Visitor').toUpperCase();
+  document.getElementById('nusr').textContent = nm;
+  document.getElementById('intro').classList.add('exit');
+  setTimeout(()=>{
+    document.getElementById('intro').style.display='none';
+    const m = document.getElementById('main');
+    m.style.display='block';
+    setTimeout(()=>{ m.classList.add('vis'); initReveal(); }, 40);
+  }, 820);
+}
+document.getElementById('enterbtn').addEventListener('click', enterSite);
+document.getElementById('uinp').addEventListener('keypress', e=>{ if(e.key==='Enter') enterSite(); });
+
+// ── NAVBAR SCROLL ──
+addEventListener('scroll', ()=>{
+  document.getElementById('nav').classList.toggle('sc', scrollY>50);
+});
+
+// ── WITCH PARALLAX ──
+const wi = document.getElementById('wimg');
+addEventListener('scroll', ()=>{
+  const hy = document.getElementById('hero').offsetHeight;
+  if(scrollY < hy && wi) {
+    wi.style.transform = `translateY(${scrollY*.16}px) translateX(${(scrollY/hy)*22}px)`;
+  }
+});
+
+// ── SCROLL REVEAL ──
+function initReveal(){
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
+  }, {threshold:.07, rootMargin:'0px 0px -36px 0px'});
+  document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+}
+initReveal();
+
+// ── MODAL ──
+function openMod(t){
+  document.getElementById('mtit').textContent = t;
+  document.getElementById('vmod').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMod(){
+  document.getElementById('vmod').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('vmod').addEventListener('click', e=>{ if(e.target===document.getElementById('vmod')) closeMod(); });
+addEventListener('keydown', e=>{ if(e.key==='Escape') closeMod(); });
+
+// ── BEFORE/AFTER SLIDER ──
+const basl=document.getElementById('basl'), bab=document.getElementById('bab'), baa=document.getElementById('baa'), baht=document.getElementById('baht');
+let badr=false, bap=50;
+function setBA(p){
+  bap = Math.max(4,Math.min(96,p));
+  bab.style.width = bap+'%';
+  baa.style.left = bap+'%';
+  baht.style.left = bap+'%';
+}
+setBA(50);
+basl.addEventListener('mousedown', ()=>badr=true);
+basl.addEventListener('touchstart', ()=>badr=true, {passive:true});
+document.addEventListener('mousemove', e=>{ if(!badr) return; const r=basl.getBoundingClientRect(); setBA(((e.clientX-r.left)/r.width)*100); });
+document.addEventListener('touchmove', e=>{ if(!badr) return; const r=basl.getBoundingClientRect(); setBA(((e.touches[0].clientX-r.left)/r.width)*100); }, {passive:true});
+document.addEventListener('mouseup', ()=>badr=false);
+document.addEventListener('touchend', ()=>badr=false);
+
+// ── ORDER DATA ──
+const od = {style:'',name:'',email:'',phone:'',links:'',desc:'',length:'',platform:'',ref:'',mood:'',song:'',notes:''};
+let curSt = 1;
+
+document.querySelectorAll('.sopt').forEach(o=>{
+  o.addEventListener('click', function(){
+    document.querySelectorAll('.sopt').forEach(x=>x.classList.remove('sel'));
+    this.classList.add('sel'); od.style=this.dataset.v;
+  });
+});
+document.querySelectorAll('.mopt').forEach(o=>{
+  o.addEventListener('click', function(){
+    document.querySelectorAll('.mopt').forEach(x=>x.classList.remove('sel'));
+    this.classList.add('sel'); od.mood=this.dataset.v;
+  });
+});
+
+function goStep(n){
+  if(curSt===1 && !od.style){ alert('Please select an editing style!'); return; }
+  if(curSt===2){
+    od.name=document.getElementById('oname').value.trim();
+    od.email=document.getElementById('oemail').value.trim();
+    od.phone=document.getElementById('ophone').value.trim();
+    od.links=document.getElementById('olinks').value.trim();
+    if(!od.name||!od.email){ alert('Please enter your name and email!'); return; }
+    if(!od.email.includes('@')){ alert('Please enter a valid email address!'); return; }
+  }
+  if(curSt===3){
+    od.desc=document.getElementById('odesc').value.trim();
+    od.length=document.getElementById('olen').value;
+    od.platform=document.getElementById('oplat').value;
+    od.ref=document.getElementById('oref').value.trim();
+    if(!od.desc){ alert('Please describe the edit you want!'); return; }
+  }
+  if(curSt===4){
+    od.song=document.getElementById('osong').value.trim();
+    if(!od.mood){ alert('Please select a mood!'); return; }
+    buildSum();
+  }
+  document.getElementById('st'+curSt).classList.remove('act');
+  const prev = document.querySelector(`[data-s="${curSt}"]`);
+  prev.classList.remove('act');
+  if(n>curSt) prev.classList.add('done');
+  else prev.classList.remove('done');
+  curSt = n;
+  document.getElementById('st'+curSt).classList.add('act');
+  const cur2 = document.querySelector(`[data-s="${curSt}"]`);
+  cur2.classList.add('act'); cur2.classList.remove('done');
+  document.getElementById('order').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildSum(){
+  const rows=[['EDIT STYLE',od.style],['NAME',od.name],['EMAIL',od.email],['PHONE/WA',od.phone||'—'],['FILE LINKS',od.links||'—'],['LENGTH',od.length||'—'],['PLATFORM',od.platform||'—'],['MOOD',od.mood],['SONG REQUEST',od.song||'—']];
+  document.getElementById('osum').innerHTML=
+    '<div style="font-family:\'Orbitron\',monospace;font-size:.55rem;letter-spacing:.26em;color:var(--red);margin-bottom:.85rem;">ORDER SUMMARY</div>'+
+    rows.map(([k,v])=>`<div class="osr"><span class="osk">${k}</span><span style="word-break:break-all;">${v}</span></div>`).join('');
+}
+
+// File upload
+document.getElementById('upz').addEventListener('click', ()=>document.getElementById('finp').click());
+document.getElementById('upz').addEventListener('dragover', e=>{ e.preventDefault(); document.getElementById('upz').classList.add('dov'); });
+document.getElementById('upz').addEventListener('dragleave', ()=>document.getElementById('upz').classList.remove('dov'));
+document.getElementById('upz').addEventListener('drop', e=>{ e.preventDefault(); document.getElementById('upz').classList.remove('dov'); showFiles(e.dataTransfer.files); });
+document.getElementById('finp').addEventListener('change', e=>showFiles(e.target.files));
+function showFiles(files){
+  const l=document.getElementById('flist'); l.innerHTML='';
+  Array.from(files).forEach(f=>{ const d=document.createElement('div'); d.className='fitem'; d.textContent='📁 '+f.name+' ('+(f.size/1024/1024).toFixed(2)+' MB)'; l.appendChild(d); });
+}
+
+// ── SUBMIT ORDER → EMAIL ──
+function submitOrder(){
+  od.notes = document.getElementById('onotes').value.trim();
+  const btn = document.getElementById('subbtn');
+  btn.disabled=true; btn.textContent='SENDING...';
+  showLoader('SENDING YOUR ORDER TO BRAJ DEV...');
+
+  const subject = `XE Studio ORDER — ${od.style} — ${od.name}`;
+  const body = [
+    'XE STUDIO — NEW ORDER',
+    '========================',
+    `Edit Style   : ${od.style}`,
+    `Client Name  : ${od.name}`,
+    `Email        : ${od.email}`,
+    `Phone/WA     : ${od.phone||'—'}`,
+    `File Links   : ${od.links||'—'}`,
+    `Video Length : ${od.length||'—'}`,
+    `Platform     : ${od.platform||'—'}`,
+    `Mood         : ${od.mood}`,
+    `Song Request : ${od.song||'—'}`,
+    `References   : ${od.ref||'—'}`,
+    '',
+    'EDIT DESCRIPTION:',
+    od.desc,
+    '',
+    'ADDITIONAL NOTES:',
+    od.notes||'—',
+    '',
+    '========================',
+    'Sent from XE Studio website',
+    `Timestamp: ${new Date().toLocaleString()}`
+  ].join('\n');
+
+  // Open mailto (always reliable — opens default email client with full order)
+  const ml = `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
+  setTimeout(()=>{
+    window.location.href = ml;
+    hideLoader();
+    orderSuccess();
+  }, 1200);
+}
+
+function orderSuccess(){
+  document.getElementById('subbtn').style.display='none';
+  const s = document.getElementById('osuc'); s.style.display='block';
+  s.innerHTML=`
+    <div style="font-size:2.4rem;margin-bottom:.85rem;">✅</div>
+    <div style="font-family:'Orbitron',monospace;font-size:.72rem;letter-spacing:.2em;color:#00ff88;">ORDER SUBMITTED!</div>
+    <div style="margin-top:.85rem;color:rgba(255,255,255,.48);font-size:.85rem;line-height:1.9;">
+      Your order details have been prepared.<br>
+      <strong style="color:rgba(255,140,140,.8);">Please send the email that just opened</strong> to complete.<br>
+      <span style="color:rgba(255,100,100,.65);font-family:'Orbitron',monospace;font-size:.65rem;">${OWNER_EMAIL}</span><br>
+      Braj Dev will contact you within 24 hours.
+    </div>
+    <div style="margin-top:1.2rem;display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;">
+      <a href="https://wa.me/919329019647?text=${encodeURIComponent('Hi Braj Dev! I just submitted an order on XE Studio for: '+od.style+'. My name is '+od.name+'. Please confirm!')}" target="_blank" class="bp" style="text-decoration:none;font-size:.62rem;letter-spacing:.14em;clip-path:none;border-radius:2px;">💬 ALSO MSG ON WHATSAPP</a>
+      <a href="mailto:${OWNER_EMAIL}" class="bs" style="text-decoration:none;font-size:.62rem;letter-spacing:.14em;clip-path:none;border-radius:2px;">📧 EMAIL DIRECTLY</a>
+    </div>
+  `;
+}
+
+// ── PREMIUM CODES ──
+// XEBD69FUCK = free premium code given to people
+const PCODES = ['XESTUDIO2024','BRAJDEV','HELLFIRE','SCARLET','XEBD69FUCK'];
+
+function checkPrem(){
+  const code = document.getElementById('prcode').value.trim().toUpperCase();
+  const st = document.getElementById('prst');
+  const pc = document.getElementById('premcnt');
+  if(PCODES.includes(code)){
+    st.className='prst ok';
+    st.textContent='✅ CODE ACCEPTED — PREMIUM ACCESS UNLOCKED!';
+    pc.style.display='block';
+    setTimeout(()=>pc.scrollIntoView({behavior:'smooth',block:'nearest'}), 200);
+  } else {
+    st.className='prst err';
+    st.textContent='❌ INVALID CODE — CONTACT BRAJ DEV FOR ACCESS';
+    pc.style.display='none';
+    setTimeout(()=>{ if(st.className.includes('err')) st.textContent=''; }, 3000);
+  }
+}
+
+// ── TESTIMONIALS ──
+const td=[
+  {n:'Aryan S.',r:'Photographer',a:'AS',t:'Braj Dev literally transformed my raw travel footage into a cinematic masterpiece. The color grading was insane. Every frame felt like a movie.',s:5},
+  {n:'Priya M.',r:'Content Creator',a:'PM',t:'Ordered an Instagram reel and got it back in 24 hours. The transitions and music sync were on another level. My followers went crazy!',s:5},
+  {n:'Rahul K.',r:'Musician',a:'RK',t:'The emotional edit for my song was exactly what I envisioned. Braj Dev understood my vision better than I did. Pure artistry.',s:5},
+  {n:'Sneha T.',r:'Wedding Videographer',a:'ST',t:'I send my couple shoots to XE Studio regularly. The love story edits always leave clients in tears — in the best way.',s:5},
+  {n:'Dev P.',r:'Vlogger',a:'DP',t:'The travel story edit was breathtaking. Made my boring vacation footage look like a Netflix travel documentary. 100% recommend!',s:5},
+  {n:'Kavya R.',r:'Influencer',a:'KR',t:'Fast delivery, insane quality, and Braj Dev actually listens to what you want. Best editing service in India.',s:5},
+];
+const tt = document.getElementById('ttrk');
+function mkCard(t){ return `<div class="tcrd"><div class="tst">${'★'.repeat(t.s)}</div><div class="ttxt">"${t.t}"</div><div class="tau"><div class="tav">${t.a}</div><div><div class="tnm">${t.n}</div><div class="trl">${t.r}</div></div></div></div>`; }
+tt.innerHTML = [...td,...td].map(mkCard).join('');
+
+// ── CONTACT FORM → EMAIL ──
+function sendContact(){
+  const name=document.getElementById('cn').value.trim();
+  const email=document.getElementById('ce').value.trim();
+  const subj=document.getElementById('cs').value.trim();
+  const msg=document.getElementById('cm').value.trim();
+  if(!name||!email||!msg){ alert('Please fill in all required fields!'); return; }
+  if(!email.includes('@')){ alert('Please enter a valid email!'); return; }
+  showLoader('SENDING YOUR MESSAGE...');
+
+  const subject = subj||`Message from ${name} via XE Studio`;
+  const body = `From: ${name}\nEmail: ${email}\n\nMessage:\n${msg}\n\n---\nSent from XE Studio contact form\n${new Date().toLocaleString()}`;
+  const ml = `mailto:${OWNER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  setTimeout(()=>{
+    window.location.href = ml;
+    hideLoader();
+    document.getElementById('cfrm').style.display='none';
+    const s=document.getElementById('csuc'); s.style.display='block';
+    s.innerHTML='✅<br>MESSAGE PREPARED!<br>Please send the email that opened.<br><small style="color:rgba(255,100,100,.6);font-family:\'Orbitron\',monospace;font-size:.6rem;">'+OWNER_EMAIL+'</small>';
+  }, 1000);
+}
+
+// ── LOADER ──
+function showLoader(txt){ document.getElementById('lovt').textContent=txt||'LOADING...'; document.getElementById('lovl').classList.add('show'); }
+function hideLoader(){ document.getElementById('lovl').classList.remove('show'); }
+</script>
+</body>
+</html>
